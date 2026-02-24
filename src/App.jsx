@@ -7,27 +7,23 @@ import Home from './Pages/Dashboad'
 import Products from './Pages/Products'
 import Customer from './Pages/Customer'
 import Sales from './Pages/Sales' 
+import AuthRoutes from './Components/AuthRoutes';
+import Login from './Pages/Login';
+import Cart from './Pages/Cart';
 
 function App() {
 
   return (
-    <>
     <BrowserRouter>
-      {/* Routes */}
-      <Sidebar />
-      <div className="main">
-      <Navbar />   
-         <Routes>
-        <Route path="/" element={<Home/>} />
-        <Route path="/Products" element={<Products />} />
-        <Route path="/Customer" element={<Customer />} />
-        <Route path="/Sales" element={<Sales />} />
-      
+      <Routes>
+        <Route path="/" element={<AuthRoutes><Home /></AuthRoutes>} />
+        <Route path="/Products" element={<AuthRoutes><Products /></AuthRoutes>} />
+        <Route path="/Customer" element={<AuthRoutes><Customer /></AuthRoutes>} />
+        <Route path="/Sales" element={<AuthRoutes><Sales /></AuthRoutes>} />
+        <Route path="/cart" element={<AuthRoutes><Cart /></AuthRoutes>} />
+        <Route path="/login" element={<Login />} />
       </Routes>
-      </div>
     </BrowserRouter>
-
-    </>
   )
 }
 

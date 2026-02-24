@@ -1,234 +1,167 @@
-import { useState } from "react";
-import "./Customer.css"; // We'll create this CSS file for styling
+import React, { useState, useEffect } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import CustomerModal from "../Components/CustomerModal";
 
-function Customer() {
-  const [showModal, setShowModal] = useState(false);
+export default function Customer() {
   const [customers, setCustomers] = useState([]);
-
+  const [users, setUser] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    address: "",
-    username: "",
-    password: ""
+    Address: "",
+    Username: "",
   });
 
-  // kushika value za input
+  const [editIndex, setEditIndex] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [customer, setCustomer] = useState([]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
-  // ku-add customer
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Check if all fields are filled
-    if (formData.name && formData.phone && formData.address && formData.username && formData.password) {
-      setCustomers([...customers, formData]);
+    setLoading(true);
+    setError(null);
+    try {
+      const isEdit = editIndex !== null;
+      const url = isEdit
+        ? `http://127.0.0.1:8000/api/customer/${formData.id}/`
+        : "http://127.0.0.1:8000/api/customer/";
+      const method = isEdit ? "PUT" : "POST";
 
-      setFormData({
-        name: "",
-        phone: "",
-        address: "",
-        username: "",
-        password: ""
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
 
-      setShowModal(false);
-    } else {
-      alert("Please fill in all fields");
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+      const saved = await res.json();
+
+      if (isEdit) {
+        const updatedCustomer = [...customer];
+        updatedCustomer[editIndex] = saved;
+        setCustomer(updatedCustomer);
+        setEditIndex(null);
+      } else {
+        setCustomer([...customer, saved]);
+      }
+
+      setFormData({ name: "", price: "", user: "" });
+    } catch (err) {
+      setError(err.message || "Save failed");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Close modal function
-  const closeModal = () => {
-    setShowModal(false);
-    setFormData({
-      name: "",
-      phone: "",
-      address: "",
-      username: "",
-      password: ""
-    });
+  const handleEdit = (index) => {
+    setFormData(customer[index]);
+    setEditIndex(index);
+    // close model
+      const modal = document.getElementById("CustomerModal");
+      const bsModal = window.bootstrap.Modal.getInstance(modal);
+      bsModal.hide();
   };
+
+  const handleDelete = async (index) => {
+    const filteredCustomer = customer.filter((_, i) => i !== index);
+
+    const url = `http://127.0.0.1:8000/api/customer/${customer[index].id}/`;
+    const res = await fetch(url, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+
+    setCustomer(filteredCustomer);
+  };
+
   useEffect(() => {
-      const fetchProducts = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          const res = await fetch("http://127.0.0.1:8000/api/products/");
-          if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
-          const data = await res.json();
-          setProducts(data);
-        } catch (err) {
-          setError(err.message || "Failed to fetch products");
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      const fetchUser = async () => {
-        try {
-          const res = await fetch("http://127.0.0.1:8000/api/user/");
-          if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
-          const data = await res.json();
-          console.log(data);
-          setUser(data);
-        } catch (err) {
-          setError(err.message || "Failed to fetch users");
-        }
-      };
-  
-      fetchProducts();
-      fetchUser();
-    }, []);
+    const fetchCustomer = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/customer/");
+        if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
+        const data = await res.json();
+        setCustomer(data);
+        console.log(data);
+      } catch (err) {
+        setError(err.message || "Failed to fetch Customer");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+    fetchCustomer();
+  }, []);
 
   return (
-    <div className="container mt-4">
+    <div className="container my-5">
 
-      <div className="text-end mb-3">
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowModal(true)}
-        >
+      <div className="d-flex justify-content-end mb-3">
+        <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CustomerModal">
           Add New Customer
         </button>
       </div>
 
-      {/* Modal Pop-up */}
-      {showModal && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            
-            <div className="modal-header">
-              <h4 className="modal-title">Add New Customer</h4>
-              <button className="close-btn" onClick={closeModal}>&times;</button>
-            </div>
+     
 
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body">
-                <div className="form-group">
-                  <label htmlFor="name">Customer Name *</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="form-control"
-                    placeholder="Enter customer name"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="phone">Phone Number *</label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="form-control"
-                    placeholder="Enter phone number"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="address">Address *</label>
-                  <textarea
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className="form-control"
-                    placeholder="Enter address"
-                    rows="2"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="username">Username *</label>
-                  <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    className="form-control"
-                    placeholder="Enter username"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="password">Password *</label>
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="form-control"
-                    placeholder="Enter password"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Add Customer
-                </button>
-              </div>
-            </form>
-
-          </div>
-        </div>
-      )}
-
-      {/* Table */}
-      <table className="table table-bordered">
-        <thead className="table-dark">
-          <tr>
-            <th>NAME</th>
-            <th>PHONE</th>
-            <th>ADDRESS</th>
-            <th>USERNAME</th>
-            <th>PASSWORD</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.length === 0 ? (
+      {/* Product Table */}
+      <div className="table-responsive">
+        <table className="table table-striped table-bordered text-center align-middle">
+          <thead className="table-dark">
             <tr>
-              <td colSpan="5" className="text-center">
-                No customers available
-              </td>
+              <th>Name</th>
+              <th>phone</th>
+              <th>Address</th>
+              <th>Username</th>
+              <th>Actions</th>
             </tr>
-          ) : (
-            customers.map((cust, index) => (
-              <tr key={index}>
-                <td>{cust.name}</td>
-                <td>{cust.phone}</td>
-                <td>{cust.address}</td>
-                <td>{cust.username}</td>
-                <td>{cust.password}</td>
+          </thead>
+          <tbody>
+            {customer.length === 0 ? (
+              <tr>
+                <td colSpan="4">No customer available</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              customer.map((product, index) => (
+                <tr key={index}>
+                  <td>{product.name}</td>
+                  <td>{product.phone}</td>
+                  <td>{product.Address}</td>
+                  <td>{product.Username}</td>
+                  <td>
+                    <button
+                      className="btn btn-success btn-sm me-2"  data-bs-toggle="modal" data-bs-target="#CustomerModal"
+                      onClick={() => handleEdit(index)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(index)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      <CustomerModal Customer={Customer} users={users} formData={formData} setFormData={setFormData} handleSubmit={handleSubmit} editIndex={editIndex} handleChange={handleChange} />
 
     </div>
   );
 }
-
-export default Customer;
