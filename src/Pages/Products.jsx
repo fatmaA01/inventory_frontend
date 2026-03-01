@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ProductModal from "../Components/ProductModal";
+import { apiCall } from "../utils/api";
 
 export default function ProductPage() {
   const [products, setProducts] = useState([]);
@@ -8,7 +9,7 @@ export default function ProductPage() {
   const [formData, setFormData] = useState({
     name: "",
     price: "",
-    user: "",
+    user: localStorage.getItem('user_id') || "",
   });
 
   const [editIndex, setEditIndex] = useState(null);
@@ -28,14 +29,16 @@ export default function ProductPage() {
     setError(null);
     try {
       const isEdit = editIndex !== null;
+
+      console.log("Submitting form  data:", formData);
+
       const url = isEdit
         ? `http://127.0.0.1:8000/api/products/${formData.id}/`
         : "http://127.0.0.1:8000/api/products/";
       const method = isEdit ? "PUT" : "POST";
 
-      const res = await fetch(url, {
+      const res = await apiCall(url, {
         method,
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
@@ -64,17 +67,22 @@ export default function ProductPage() {
     setEditIndex(index);
   };
 
-  const handleDelete = (index) => {
+  const handleDelete = async (index) => {
+
+      const productId = products[index].id;
+      await apiCall(`http://127.0.0.1:8000/api/products/${productId}/`
+        , { method: "DELETE" });
+
     const filteredProducts = products.filter((_, i) => i !== index);
     setProducts(filteredProducts);
   };
-
+                                                              
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/products/");
+        const res = await apiCall("http://127.0.0.1:8000/api/products/");
         if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
         const data = await res.json();
         setProducts(data);
@@ -85,20 +93,8 @@ export default function ProductPage() {
       }
     };
 
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("http://127.0.0.1:8000/api/user/");
-        if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
-        const data = await res.json();
-        console.log(data);
-        setUser(data);
-      } catch (err) {
-        setError(err.message || "Failed to fetch users");
-      }
-    };
-
+   
     fetchProducts();
-    fetchUser();
   }, []);
 
   return (
@@ -119,7 +115,7 @@ export default function ProductPage() {
             <tr>
               <th>Name</th>
               <th>Price</th>
-              <th>User</th>
+              <th>Quantity</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -133,7 +129,7 @@ export default function ProductPage() {
                 <tr key={index}>
                   <td>{product.name}</td>
                   <td>{product.price}</td>
-                  <td>{product.user}</td>
+                  <td>{product.quantity}</td>
                   <td>
                     <button
                       className="btn btn-success btn-sm me-2"

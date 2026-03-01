@@ -22,33 +22,36 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault()
         setError('')
-        setLoading(true)
+        setLoading(true)                    
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/login', {
+            const response = await fetch('http://127.0.0.1:8000/api/login/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form)
+                body: JSON.stringify({
+                    username: form.username,
+                    password: form.password
+                })
             })
             
             const data = await response.json()
             
             if (!response.ok) {
-                setError(data.message || 'Login failed')
+                setError(data.detail || data.error || data.message || 'Login failed')
                 setLoading(false)
                 return
             }
 
-            if (data.token && data.user_id) {
+            if (data.token) {
                 localStorage.setItem('auth', data.token)
-                localStorage.setItem('user_id', data.user_id)
+                if (data.user_id) localStorage.setItem('user_id', data.user_id)
                 window.location.href = '/'
             } else {
-                setError('Invalid credentials')
+                setError('Login response missing token')
+                setLoading(false)
             }
         } catch (error) {
             setError('Login failed: ' + error.message)
             console.error('Login error:', error)
-        } finally {
             setLoading(false)
         }
     }
@@ -105,10 +108,6 @@ const Login = () => {
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
-
-          <div className="text-center">
-            <p className="text-muted">Don't have an account? <a href="/signup" className="text-decoration-none fw-bold">Sign up</a></p>
-          </div>
         </div>
       </div>
     </div>

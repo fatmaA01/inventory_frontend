@@ -39,7 +39,7 @@ const ProductModal = ({ products, users, formData, setFormData, handleSubmit, ed
             required
           />
         </div>
-        <div className="col-md-6">
+        <div className="col-md-12">
           <input
             type="text"
             name="price"
@@ -50,19 +50,19 @@ const ProductModal = ({ products, users, formData, setFormData, handleSubmit, ed
             required
           />
         </div>
-
-
-        <div className="col-md-6">
-
-<select name="user" id="userSelect" className="form-select" value={formData.user} onChange={handleChange}>
-
-    <option value="">Select User</option>
-    {users.map((user) => (
-        <option style={{color : 'black'}} key={user.id} value={user.id}>{user.name}</option>
-    ))}
-</select>
-
+        <div className="col-md-12">
+          <input
+            type="text"
+            name="quantity"
+            className="form-control"
+            placeholder="Quantity"
+            value={formData.quantity}
+            onChange={handleChange}
+            required
+          />
         </div>
+
+
         <div className="col-12">
           <button type="submit" className="btn btn-primary w-100">
             {editIndex !== null ? "Update Product" : "Add Product"}

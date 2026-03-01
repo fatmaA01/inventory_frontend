@@ -1,91 +1,118 @@
-import React from 'react'
+// SalesModal.jsx
+import React from "react";
 
-const SalesModal = ({ products, users, formData, setFormData, handleSubmit, editIndex }) => {
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData(prev => {
-      const updated = { ...prev, [name]: value };
-
-      if (name === 'quantity' || name === 'product') {
-        const product = products.find(p => p.id == updated.product);
-        const qty = parseFloat(updated.quantity) || 0;
-        updated.total_price = product ? (product.price * qty).toFixed(2) : '';
-      }
-
-      return updated;
-    });
-  };
-
+const SalesModal = ({ 
+  products, 
+  users, 
+  formData, 
+  setFormData, 
+  handleSubmit, 
+  handleChange,
+  editIndex,
+  loading 
+}) => {
   return (
-    < >
-    <div class="modal fade" id="SalesModal" tabindex="-1" aria-labelledby="SalesModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="SalesModalLabel">Add New Sale</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div className="modal fade" id="SalesModal" tabIndex="-1" aria-labelledby="SalesModalLabel" aria-hidden="true">
+      <div className="modal-dialog">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title" id="SalesModalLabel">
+              {editIndex !== null ? "Edit Sale" : "Add New Sale"}
+            </h5>
+            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div className="modal-body">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label htmlFor="product" className="form-label">Product</label>
+                <select
+                  className="form-select"
+                  id="product"
+                  name="product"
+                  value={formData?.product || ""}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Select a product</option>
+                  {products?.map((product) => (
+                    <option key={product.id} value={product.id}>
+                      {product.name} - ${product.price} (Stock: {product.quantity})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="quantity" className="form-label">Quantity</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="quantity"
+                  name="quantity"
+                  value={formData?.quantity || ""}
+                  onChange={handleChange}
+                  min="1"
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="total_price" className="form-label">Total Price</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="form-control"
+                  id="total_price"
+                  name="total_price"
+                  value={formData?.total_price || ""}
+                  readOnly
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="user" className="form-label">User</label>
+                <select
+                  className="form-select"
+                  id="user"
+                  name="user"
+                  value={formData?.user || ""}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Select a user</option>
+                  {users?.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.username} ({user.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" disabled={loading}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      {editIndex !== null ? "Updating..." : "Saving..."}
+                    </>
+                  ) : (
+                    editIndex !== null ? "Update Sale" : "Save Sale"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
-      <div class="modal-body">
-              <form onSubmit={handleSubmit} className="row g-3 mb-4">
-        <div className="col-md-12">
-        <select name="product" id="productSelect" className="form-select" value={formData.product} onChange={handleChange}>
-
-    <option value=""  >Select product</option>
-    {products.map((product) => (
-        <option  key={product.id} value={product.id}>{product.name}</option>
-    ))}
-</select>
-</div>
-        <div className="col-md-12">
-          <input
-            type="number"
-            name="quantity"
-            className="form-control"
-            placeholder="Quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-
-        <div className="col-md-12">
-          <input
-            type="number"
-            name="total_price"
-            className="form-control"
-            placeholder="Total Price"
-            value={formData.total_price}
-            onChange={handleChange}
-            readOnly
-          />
-        </div>
-
-
-        <div className="col-md-12">
-        <select name="user" id="userSelect" className="form-select" value={formData.user} onChange={handleChange}>
-
-    <option value="">Select User</option>
-    {users.map((user) => (
-        <option  key={user.id} value={user.id}>{user.name}</option>
-    ))}
-</select>
-</div>
-        <div className="col-12">
-          <button type="submit" className="btn btn-primary w-100">
-            {editIndex !== null ? "Update Sale" : "Add Sale"}
-          </button>
-        </div>
-      </form>
-      </div>
-
     </div>
-  </div>
-</div>
+  );
+};
 
-    </>
-  )
-}
-
-export default SalesModal
+export default SalesModal;
