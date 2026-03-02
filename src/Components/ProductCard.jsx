@@ -68,7 +68,7 @@ const ProductCard = ({ name, price }) => {
     const fetchSales = async () => {
       setError(null);
       try {
-        const res = await apiCall("http://127.0.0.1:8000/api/sales/");
+        const res = await apiCall("https://inventory-backend-zhvg.onrender.com/api/sales/");
         if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
         const data = await res.json();
         setSales(data);
@@ -79,7 +79,7 @@ const ProductCard = ({ name, price }) => {
 
     const fetchUser = async () => {
       try {
-        const res = await apiCall("http://127.0.0.1:8000/api/user/");
+        const res = await apiCall("https://inventory-backend-zhvg.onrender.com/api/user/");
         if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
         const data = await res.json();
         setUser(data);
@@ -89,7 +89,7 @@ const ProductCard = ({ name, price }) => {
     };
     const fetchProducts = async () => {
       try {
-        const res = await apiCall("http://127.0.0.1:8000/api/products/");
+        const res = await apiCall("https://inventory-backend-zhvg.onrender.com/api/products/");
         if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
         const data = await res.json();
         setProducts(data);

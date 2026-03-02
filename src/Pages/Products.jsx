@@ -33,8 +33,8 @@ export default function ProductPage() {
       console.log("Submitting form  data:", formData);
 
       const url = isEdit
-        ? `http://127.0.0.1:8000/api/products/${formData.id}/`
-        : "http://127.0.0.1:8000/api/products/";
+        ? `https://inventory-backend-zhvg.onrender.com/api/products/${formData.id}/`
+        : "https://inventory-backend-zhvg.onrender.com/api/products/";
       const method = isEdit ? "PUT" : "POST";
 
       const res = await apiCall(url, {
@@ -70,7 +70,7 @@ export default function ProductPage() {
   const handleDelete = async (index) => {
 
       const productId = products[index].id;
-      await apiCall(`http://127.0.0.1:8000/api/products/${productId}/`
+      await apiCall(`https://inventory-backend-zhvg.onrender.com/api/products/${productId}/`
         , { method: "DELETE" });
 
     const filteredProducts = products.filter((_, i) => i !== index);
@@ -82,7 +82,7 @@ export default function ProductPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await apiCall("http://127.0.0.1:8000/api/products/");
+        const res = await apiCall("https://inventory-backend-zhvg.onrender.com/api/products/");
         if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
         const data = await res.json();
         setProducts(data);

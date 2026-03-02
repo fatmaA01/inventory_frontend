@@ -156,9 +156,9 @@ const Dashboard = () => {
       setError(null);
       try {
         const [productsRes, salesRes, usersRes] = await Promise.all([
-          apiCall("http://127.0.0.1:8000/api/products/"),
-          apiCall("http://127.0.0.1:8000/api/sales/"),
-          apiCall("http://127.0.0.1:8000/api/user/")
+          apiCall("https://inventory-backend-zhvg.onrender.com/api/products/"),
+          apiCall("https://inventory-backend-zhvg.onrender.com/api/sales/"),
+          apiCall("https://inventory-backend-zhvg.onrender.com/api/user/")
         ]);
 
         if (!productsRes.ok) throw new Error('Failed to fetch products');

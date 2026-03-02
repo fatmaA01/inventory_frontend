@@ -111,7 +111,7 @@ const Sales = () => {
 
       let response;
       if (editId) {
-        response = await apiCall(`http://127.0.0.1:8000/api/sales/${editId}/`, {
+        response = await apiCall(`https://inventory-backend-zhvg.onrender.com/api/sales/${editId}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ const Sales = () => {
           body: JSON.stringify(saleData)
         });
       } else {
-        response = await apiCall("http://127.0.0.1:8000/api/sales/", {
+        response = await apiCall("https://inventory-backend-zhvg.onrender.com/api/sales/", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ const Sales = () => {
     setSuccess(null);
 
     try {
-      const response = await apiCall(`http://127.0.0.1:8000/api/sales/${id}/`, {
+      const response = await apiCall(`https://inventory-backend-zhvg.onrender.com/api/sales/${id}/`, {
         method: 'DELETE',
       });
 
@@ -217,7 +217,7 @@ const Sales = () => {
 
   const fetchSales = async () => {
     try {
-      const response = await apiCall("http://127.0.0.1:8000/api/sales/");
+      const response = await apiCall("https://inventory-backend-zhvg.onrender.com/api/sales/");
       if (!response.ok) throw new Error(`Fetch error: ${response.status}`);
       const data = await response.json();
       setSales(data);
@@ -228,7 +228,7 @@ const Sales = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await apiCall("http://127.0.0.1:8000/api/user/");
+      const response = await apiCall("https://inventory-backend-zhvg.onrender.com/api/user/");
       if (!response.ok) throw new Error(`Fetch error: ${response.status}`);
       const data = await response.json();
       setUsers(data);
@@ -239,7 +239,7 @@ const Sales = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await apiCall("http://127.0.0.1:8000/api/products/");
+      const response = await apiCall("https://inventory-backend-zhvg.onrender.com/api/products/");
       if (!response.ok) throw new Error(`Fetch error: ${response.status}`);
       const data = await response.json();
       setProducts(data);
