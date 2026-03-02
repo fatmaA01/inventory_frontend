@@ -53,13 +53,9 @@ const Navbar = () => {
             aria-expanded="false"
           >
             {/* Avatar */}
-            <img
-              src="https://i.pravatar.cc/40"
-              alt="avatar"
-              width="40"
-              height="40"
-              className="rounded-circle"
-            />
+            <div className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+              {localStorage.getItem('user_id') ? localStorage.getItem('user_id').charAt(0).toUpperCase() : 'U'}
+            </div>
           </button>
 
           {/* Dropdown Menu */}
